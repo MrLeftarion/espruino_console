@@ -1,10 +1,28 @@
 I2C1.setup({scl:B8,sda:B9});
 var g = require("SSD1306").connect(I2C1);
-var x = new Pin(A0);
-var jCentBtn = require('@amperka/button').connect(B1);
-var y = new Pin(A1);
-x.mode('analog');
-y.mode('analog');
+var joystick = {
+  pinX: new Pin(A0),
+  pinY: new Pin(A1),
+  button: require('@amperka/button').connect(B1),
+  x: 31,
+  y: 31,
+  xl: 31,
+  yl: 31,
+  update: function(){
+    joystick.xl = joystick.x;
+    joystick.yl = joystick.y;
+    joystick.x = Math.round(analogRead(A0/*this.pinX*/)*63);
+    joystick.y = Math.round(analogRead(A1/*this.pinY*/)*63);
+    g.drawString(joystick.x,20,70);
+    g.flip();
+  },
+  start: function(){
+    joystick.pinX.mode('analog');
+    joystick.pinY.mode('analog');
+    setInterval(function(){joystick.update();},10);
+  }
+};
+joystick.start();
 g.clear();
 g.invert = function(x1,y1,x2,y2){
   for(ix=x1;ix<=x2;ix++){
@@ -18,13 +36,13 @@ g.invert = function(x1,y1,x2,y2){
     }
   }
 };
-var games = new Array("dino.txt","flappy.txt","2048.txt");
+//var games = new Array("dino.txt","flappy.txt","2048.txt");
 function delay(waitTime){
   waitTime/=1000;
   old_time = getTime();
   for(var delta_time;;){
     delta_time = getTime() - old_time;
-    if (delta_time > waitTime){ 
+    if (delta_time > waitTime){
       break;
     }
   }
@@ -55,14 +73,14 @@ var mmc = {//my menu controller - mmc
   openlastmenu: function(){mmc.openMenu(mmc.nowmenu);},
 };
 var my = 0;
-function edc( step){
+/*function edc( step){
   var stepsCount = 1;
-  /*var up = Graphics.createImage(`
+  var up = Graphics.createImage(`
   *
  ***
 * * *
   *
-`);*/
+`);
   var gpad = function(){
     g.scroll(50,50);
     g.drawCircle(100,30,4);
@@ -76,10 +94,10 @@ function edc( step){
   };
   g.clear();
   gpad();
-  //g.fillCircle(80,40,1);
-  //m = g.dump();
+  g.fillCircle(80,40,1);
+  m = g.dump();
   g.flip();
-}
+}*/
 //var boolean = false;
 var contrastValue = 150;
 var mainmenu = {
@@ -120,16 +138,16 @@ var testingMenu = {
   " joystic test" : function(){
     mmc.closemenu();
     jt = setInterval(function (){
-      var xv = Math.round(analogRead(x)*64);
-      var yv = Math.round(analogRead(y)*64);
+      var xv = joystick.x;
+      var yv = joystick.y;
       g.clear();
       g.drawRect(0,0,63,63);
-      g.drawLine(xv,yv-1,xv,yv+1);
-      g.drawLine(xv-1,yv,xv+1,yv);
+      g.drawLine(xv,yv-2,xv,yv+2);
+      g.drawLine(xv-2,yv,xv+2,yv);
       g.drawString(`x: ${xv}`,70,20);
-      g.drawString(`y:${yv}`,70,30);
+      g.drawString(`y: ${yv}`,70,30);
       g.flip();
-      if(jCentBtn.isPressed()){
+      if(joystick.button.isPressed()){
         clearInterval(jt);
         mmc.openlastmenu();
       }
@@ -167,13 +185,13 @@ function onInit() {
   mmc.openMenu("mainmenu");
 }
 function update(){
-  if(analogRead(y) >= 0.6 && m != null){
+  if(joystick.y >= 37 && m != null){
     m.move(1);
   }
-  else if(analogRead(y) <= 0.4 && m != null){
+  else if(joystick.y <= 27 && m != null){
     m.move(-1);
   }
-  if(jCentBtn.isPressed() && m != null){
+  if(joystick.button.isPressed() && m != null){
     m.select();
   }
 }
