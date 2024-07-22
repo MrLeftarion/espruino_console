@@ -1,2 +1,2 @@
 # espruino_console
-version: 0.5_indave
+version: 0.5_indev

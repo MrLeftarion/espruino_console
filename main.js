@@ -25,6 +25,12 @@ var joystick = {
     setInterval(function(){joystick.update();},10);
   }
 };
+var buttons = {
+  X: require('@amperka/button').connect(A0),
+  Y: require('@amperka/button').connect(A5),
+  A: require('@amperka/button').connect(A7),
+  B: require('@amperka/button').connect(A6),
+};
 joystick.start();
 g.clear();
 g.invert = function(x1,y1,x2,y2){
@@ -39,7 +45,7 @@ g.invert = function(x1,y1,x2,y2){
     }
   }
 };
-//var games = new Array("dino.txt","flappy.txt","2048.txt");
+var games = [];
 function delay(waitTime){
   waitTime/=1000;
   old_time = getTime();
