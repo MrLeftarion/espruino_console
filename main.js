@@ -1,8 +1,11 @@
 I2C1.setup({scl:B8,sda:B9});
 var g = require("SSD1306").connect(I2C1);
+SPI2.setup({mosi:B15,miso:B14,sck:B13,});
+var fs = require("fs");
+E.connectSDCard(SPI2, A10);
 var joystick = {
-  pinX: new Pin(A0),
-  pinY: new Pin(A1),
+  pinX: new Pin(A1),
+  pinY: new Pin(B0),
   button: require('@amperka/button').connect(B1),
   x: 31,
   y: 31,
@@ -11,8 +14,8 @@ var joystick = {
   update: function(){
     joystick.xl = joystick.x;
     joystick.yl = joystick.y;
-    joystick.x = Math.round(analogRead(A0/*this.pinX*/)*63);
-    joystick.y = Math.round(analogRead(A1/*this.pinY*/)*63);
+    joystick.x = Math.round(analogRead(joystick.pinX)*63);
+    joystick.y = Math.round(analogRead(joystick.pinY)*63);
     g.drawString(joystick.x,20,70);
     g.flip();
   },
