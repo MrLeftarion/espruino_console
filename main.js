@@ -103,7 +103,7 @@ var mainmenu = {
   "" : {
     "title" : " Menu "
   },
-  "Play" : function(){mmc.open("playMenu");},
+  "Play" : function(){mmc.open("gamesListMenu");},
   //"Submenu" : function(){mmc.open("submenu"); },
   //" A Boolean" : {value : boolean,format : v => v?"On":"Off",onchange : v => { boolean=v; }},
   "settings" : function(){mmc.open("settingsMenu"); },
@@ -164,13 +164,27 @@ var testingMenu = {
 };*/
 var gamesListMenu = {
   "" : {
-    "title" : "games",
+    "title" : "games and programms",
   },
-  "test0" : function(){g.setPixel(63,40,0);g.flip();},
-  "test1" : function(){g.setPixel(63,40);g.flip();},
-  "test2" : function(){console.log(g.getPixel(63,40));},
   "< Back" : function(){mmc.open("mainmenu");}
 };
+function startGame(path){
+  eval(sdCard.readFile(path));
+}
+function checkGames(){
+  games = sdCard.readDir('games');
+  gamesListMenu = {
+    "" : {
+    "title" : "games and programms",
+    },
+    "< Back" : function(){mmc.open("mainmenu");}
+  };
+  for(i=0;i<games.length;i++){
+    var gamesname = games[i].split(".");
+    mmc.addElement("gamesListMenu",gamesname[0],`function(){startGame("games\\\\${gamesname[0]}.${gamesname[1]}");}`);
+     console.log(i);
+  }
+}
 var settingsMenu = {
   "" : {
     "title" : " Settings "
