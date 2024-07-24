@@ -66,7 +66,7 @@ var mmc = {//my menu controller - mmc
       mmc.lastmenu = mmc.nowmenu;mmc.nowmenu = menuName;
     }
   },
-  openMenu: function(menuName){
+  open: function(menuName){
     if(m == null){
       g.clear();
       eval(`m = menu.list(g, ${menuName});`);
@@ -79,7 +79,7 @@ var mmc = {//my menu controller - mmc
   lastmenu: "",
   nowmenu: "",
   closemenu: function(){m=null;g.clear();},
-  openlastmenu: function(){mmc.openMenu(mmc.nowmenu);},
+  openlastmenu: function(){mmc.open(mmc.nowmenu);},
 };
 var my = 0;
 /*function edc( step){
@@ -141,8 +141,9 @@ var testingMenu = {
     for(i=0;i<128;i++){
       g.drawLine(i,0,i,63);
       g.flip();
-    }delay(500);
-    mmc.change("testingMenu");
+    }
+    while(!joystick.button.isPressed()){}
+    mmc.open("testingMenu");
   },
   " joystic test" : function(){
     mmc.closemenu();
@@ -191,7 +192,7 @@ var settingsMenu = {
   " < Back" : function() {mmc.change("mainmenu");}
 };
 function onInit() {
-  mmc.openMenu("mainmenu");
+  mmc.open("mainmenu");
 }
 function update(){
   if(joystick.y >= 37 && m != null){
