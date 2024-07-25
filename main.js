@@ -1,5 +1,3 @@
-var btndmp = require('@amperka/button').connect(A4);
-btndmp.on('press',function(){g.dump();});
 I2C1.setup({scl:B8,sda:B9});
 var g = require("SSD1306").connect(I2C1);
 var sdCard = require('@amperka/card-reader').connect(A10);
@@ -72,52 +70,14 @@ var mmc = {//my menu controller - mmc
   openlastmenu: function(){mmc.open(mmc.nowmenu);},
 };
 var my = 0;
-/*function edc( step){
-  var stepsCount = 1;
-  var up = Graphics.createImage(`
-  *
- ***
-* * *
-  *
-`);
-  var gpad = function(){
-    g.scroll(50,50);
-    g.drawCircle(100,30,4);
-    g.drawCircle(100,50,4);
-    g.drawCircle(90,40,4);
-    g.drawCircle(110,40,4);
-    g.drawCircle(30,40,10);
-    //g.drawImage(up,28,25);
-    g.drawRect(45,10,85,30);
-
-  };
-  g.clear();
-  gpad();
-  g.fillCircle(80,40,1);
-  m = g.dump();
-  g.flip();
-}*/
-//var boolean = false;
 var contrastValue = 150;
 var mainmenu = {
   "" : {
     "title" : " Menu "
   },
   "Play" : function(){mmc.open("gamesListMenu");},
-  //"Submenu" : function(){mmc.open("submenu"); },
-  //" A Boolean" : {value : boolean,format : v => v?"On":"Off",onchange : v => { boolean=v; }},
   "settings" : function(){mmc.open("settingsMenu"); },
   "testing console" : function(){mmc.open("testingMenu");},
-  "eval('Hello world!')" : function(){
-    eval(`
-      for(i=5;i>0;i--){
-        console.log(i);
-        delay(1000)
-      }
-      delay(1000);
-      console.log("Hello world!");
-    `);
-  }
 };
 var testingMenu = {
   "" : {
@@ -154,14 +114,6 @@ var testingMenu = {
     },20);},
   "< Back" : function(){mmc.open("mainmenu");}
 };
-/*var submenu = {
-  "" : {
-    "title" : " SubMenu "
-  },
-  "edc" : function(){m=null;edc();},
-  "testing console" : function(){mmc.open("testingMenu");},
-  "< Back" : function(){mmc.open("mainmenu");}
-};*/
 var gamesListMenu = {
   "" : {
     "title" : "games and programms",
@@ -182,13 +134,14 @@ function checkGames(){
   for(i=0;i<games.length;i++){
     var gamesname = games[i].split(".");
     mmc.addElement("gamesListMenu",gamesname[0],`function(){startGame("games\\\\${gamesname[0]}.${gamesname[1]}");}`);
-     console.log(i);
   }
 }
 var settingsMenu = {
   "" : {
     "title" : " Settings "
   },
+  "reconnoct sd card": function(){var sdCard = require('@amperka/card-reader').connect(A10);},
+  "Check out the games" : function(){checkGames();},
   "contrast" : {value : contrastValue,min:0,max:150,step:10,wrap:true,onchange : v => { contrastValue=v; }},
   "Set" : function(){
     g.setContrast(contrastValue);
@@ -196,6 +149,7 @@ var settingsMenu = {
   "< Back" : function() {mmc.open("mainmenu");}
 };
 function onInit() {
+  checkGames();
   mmc.open("mainmenu");
 }
 function update(){
