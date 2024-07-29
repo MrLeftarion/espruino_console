@@ -1,6 +1,10 @@
-I2C1.setup({scl:B8,sda:B9});
-var g = require("SSD1306").connect(I2C1);
-var sdCard = require('@amperka/card-reader').connect(A10);
+function start(){}
+var s = new SPI();
+s.setup({mosi: A7, sck:A5});
+var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A0});
+g.flip();
+var sdCard = require('@amperka/card-reader').connect(B8);
+
 var joystick = {
   pinX: new Pin(A1),
   pinY: new Pin(B0),
@@ -24,10 +28,10 @@ var joystick = {
   }
 };
 var buttons = {
-  X: require('@amperka/button').connect(A0),
-  Y: require('@amperka/button').connect(A5),
-  A: require('@amperka/button').connect(A7),
-  B: require('@amperka/button').connect(A6),
+  //X: require('@amperka/button').connect(),
+  //Y: require('@amperka/button').connect(),
+  A: require('@amperka/button').connect(B8),
+  B: require('@amperka/button').connect(B9),
 };
 joystick.start();
 g.clear();
@@ -68,6 +72,7 @@ var mmc = {//my menu controller - mmc
   nowmenu: "",
   closemenu: function(){m=null;g.clear();},
   openlastmenu: function(){mmc.open(mmc.nowmenu);},
+  extgame: function(){mmc.open("gamesListMenu");},
 };
 var my = 0;
 var contrastValue = 150;
@@ -142,7 +147,7 @@ var settingsMenu = {
   },
   "reconnoct sd card": function(){var sdCard = require('@amperka/card-reader').connect(A10);},
   "Check out the games" : function(){checkGames();},
-  "contrast" : {value : contrastValue,min:0,max:150,step:10,wrap:true,onchange : v => { contrastValue=v; }},
+  "contrast" : {value : contrastValue,min:10,max:150,step:10,wrap:true,onchange : v => { contrastValue=v; }},
   "Set" : function(){
     g.setContrast(contrastValue);
   },
@@ -153,10 +158,10 @@ function onInit() {
   mmc.open("mainmenu");
 }
 function update(){
-  if(joystick.y >= 37 &&  m != null){
+  if(joystick.y >= 39 &&  m != null){
     m.move(1);
   }
-  else if(joystick.y <= 27 && m != null){
+  else if(joystick.y <= 25 && m != null){
     m.move(-1);
   }
   if(buttons.A.isPressed() && m != null){
