@@ -1,4 +1,11 @@
 var BTNU = buttons.A;
+var dinoLeaveGame = {
+  "" : {
+    "title" :"you want to leave"
+  },
+    "Yes":function(){mmc.extgame();},
+    "No":function(){g.clear();gameStart();}
+};
 var IMG = {
   rex: [Graphics.createImage(`
            ########
@@ -120,6 +127,7 @@ IMG.rex.forEach(i=>i.transparent=0);
 IMG.cacti.forEach(i=>i.transparent=0);
 var cacti, rex, frame, oF;
 function gameStart() {
+  mmc.closemenu();
   rex = {
     alive : true,
     img : 0,
@@ -144,13 +152,6 @@ function gameStop() {
   clearInterval(oF);
   g.drawString("Game Over!",(128-g.stringWidth("Game Over!"))/2,20);
   while(BTNU.isPressed()){}
-  var dinoLeaveGame = {
-  "" : {
-    "title" :"you want to leave"
-  },
-    "Yes":function(){mmc.openlastmenu();},
-    "No":function(){g.clear();gameStart();}
-  };
   mmc.open("dinoLeaveGame");
 }
 

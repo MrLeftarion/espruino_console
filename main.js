@@ -61,6 +61,9 @@ function delay(waitTime){
 var menu = require("graphical_menu");
 var m;
 var mmc = {//my menu controller - mmc
+  addMenu: function(menuName){
+      eval(`m = menu.list(g, ${menuName});`);
+  },
   open: function(menuName){
       g.clear();
       eval(`m = menu.list(g, ${menuName});`);
