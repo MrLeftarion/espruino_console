@@ -65,50 +65,6 @@ var mmc = {//my menu controller - mmc
   openlastmenu: function(){mmc.open(mmc.nowmenu);},
   extgame: function(){mmc.open("gamesListMenu");},
 };
-var contrastValue = 150;
-var mainmenu = {
-  "" : {
-    "title" : " Menu "
-  },
-  "Play" : function(){mmc.open("gamesListMenu");},
-  "settings" : function(){mmc.open("settingsMenu"); },
-  "testing console" : function(){mmc.open("testingMenu");},
-};
-var testingMenu = {
-  "" : {
-    "title" : "test our console"
-  },
-  "LED1 on/off" : function(){LED1.write(!LED1.read());},
-  "Led2 on/off" : function(){LED2.write(!LED2.read());},
-  "display test" : function() {
-    m = null;
-    g.clear();
-    for(i=0;i<128;i++){
-      g.drawLine(i,0,i,63);
-      g.flip();
-    }
-    while(!buttons.B.isPressed()){}
-    mmc.open("testingMenu");
-  },
-  "joystic test" : function(){
-    mmc.closemenu();
-    jt = setInterval(function (){
-      var xv = joystick.x-1;
-      var yv = joystick.y-1;
-      g.clear();
-      g.drawRect(0,0,63,63);
-      g.drawLine(xv,yv-2,xv,yv+2);
-      g.drawLine(xv-2,yv,xv+2,yv);
-      g.drawString(`x: ${xv+1}`,70,20);
-      g.drawString(`y: ${yv+1}`,70,30);
-      g.flip();
-      if(buttons.B.isPressed()){
-        clearInterval(jt);
-        mmc.openlastmenu();
-      }
-    },20);},
-  "< Back" : function(){mmc.open("mainmenu");}
-};
 var gamesListMenu = {
   "" : {
     "title" : "games and programms",
@@ -129,29 +85,19 @@ function checkGames(){
   for(i=0;i<games.length;i++){
     var gamesname = games[i].split(".");
     mmc.addElement("gamesListMenu",gamesname[0],`function(){startGame("games\\\\${gamesname[0]}.${gamesname[1]}");}`);
+     console.log(i);
   }
 }
-var settingsMenu = {
-  "" : {
-    "title" : " Settings "
-  },
-  "reconnoct sd card": function(){var sdCard = require('@amperka/card-reader').connect(A10);},
-  "Check out the games" : function(){checkGames();},
-  "contrast" : {value : contrastValue,min:10,max:150,step:10,wrap:true,onchange : v => { contrastValue=v; }},
-  "Set" : function(){
-    g.setContrast(contrastValue);
-  },
-  "< Back" : function() {mmc.open("mainmenu");}
-};
-function onInit() {
-  checkGames();
-  mmc.open("mainmenu");
-}
+
+
+//
+
+
 function update(){
-  if(joystick.y >= 39 &&  m != null){
+  if(joystick.y >= 37 &&  m != null){
     m.move(1);
   }
-  else if(joystick.y <= 25 && m != null){
+  else if(joystick.y <= 27 && m != null){
     m.move(-1);
   }
   if(buttons.A.isPressed() && m != null){
@@ -159,4 +105,3 @@ function update(){
   }
 }
 var mainMenuUpdate = setInterval(update,150);
-onInit();
