@@ -1,14 +1,14 @@
 function start(){}
 var s = new SPI();
 s.setup({mosi: A7, sck:A5});
-var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A0});
+var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A10});
 g.flip();
 var sdCard = require('@amperka/card-reader').connect(B8);
 
 var joystick = {
   pinX: new Pin(A1),
   pinY: new Pin(B0),
-  button: require('@amperka/button').connect(B1),
+  button: require('@amperka/button').connect(B10),
   x: 31,
   y: 31,
   xl: 31,
@@ -28,8 +28,6 @@ var joystick = {
   }
 };
 var buttons = {
-  //X: require('@amperka/button').connect(),
-  //Y: require('@amperka/button').connect(),
   A: require('@amperka/button').connect(B8),
   B: require('@amperka/button').connect(B9),
 };

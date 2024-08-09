@@ -28,8 +28,6 @@ var joystick = {
   }
 };
 var buttons = {
-  //X: require('@amperka/button').connect(),
-  //Y: require('@amperka/button').connect(),
   A: require('@amperka/button').connect(B8),
   B: require('@amperka/button').connect(B9),
 };
