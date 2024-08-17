@@ -1,10 +1,13 @@
-function start(){}
+function start(){}//function for oled
+var settingsValue = {//set before uploading
+  contrast : 150, //from 0 to 150
+  joystick_update_time: 10, //from 10 to 100
+};
 var s = new SPI();
 s.setup({mosi: A7, sck:A5});
 var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A10});
 g.flip();
 var sdCard = require('@amperka/card-reader').connect(B8);
-
 var joystick = {
   pinX: new Pin(A1),
   pinY: new Pin(B0),
@@ -13,18 +16,23 @@ var joystick = {
   y: 31,
   xl: 31,
   yl: 31,
+  updateTime: settingsValue.joystick_update_time,
   update: function(){
     joystick.xl = joystick.x;
     joystick.yl = joystick.y;
-    joystick.x = Math.round(analogRead(joystick.pinX)*64);
-    joystick.y = Math.round(analogRead(joystick.pinY)*64);
+    joystick.x = Math.round((analogRead(joystick.pinX)*64+joystick.xl)/2);
+    joystick.y = Math.round((analogRead(joystick.pinY)*64+joystick.yl)/2);
     g.drawString(joystick.x,20,70);
     g.flip();
   },
   start: function(){
     joystick.pinX.mode('analog');
     joystick.pinY.mode('analog');
-    setInterval(function(){joystick.update();},10);
+    joystick.interval = setInterval(function(){joystick.update();},settingsValue.joystick_update_time);
+  },
+  changeUpdateTime: function(){
+    clearInterval(joystick.interval);
+    joystick.interval = setInterval(function(){joystick.update();},settingsValue.joystick_update_time);
   }
 };
 var buttons = {
@@ -53,17 +61,13 @@ var mmc = {//my menu controller - mmc
   open: function(menuName){
       g.clear();
       eval(`m = menu.list(g, ${menuName});`);
-      mmc.nowmenu = menuName;
   },
   addElement: function(menuName,elementName,element){
     eval(`${menuName}.${elementName}=${element}`);
   },
-  nowmenu: "",
   closemenu: function(){m=null;g.clear();},
-  openlastmenu: function(){mmc.open(mmc.nowmenu);},
   extgame: function(){mmc.open("gamesListMenu");},
 };
-var contrastValue = 150;
 var mainmenu = {
   "" : {
     "title" : " Menu "
@@ -99,12 +103,33 @@ var testingMenu = {
       g.drawLine(xv-2,yv,xv+2,yv);
       g.drawString(`x: ${xv+1}`,70,20);
       g.drawString(`y: ${yv+1}`,70,30);
+      g.drawString(`to exit,
+press B`,96,52);
       g.flip();
       if(buttons.B.isPressed()){
         clearInterval(jt);
-        mmc.openlastmenu();
+        mmc.open("testingMenu");
       }
     },20);},
+  "buttons test":function(){
+    mmc.closemenu();
+    bt = setInterval(function (){
+      g.clear();
+      g.drawCircle(105,35,5);
+      g.drawCircle(90,45,5);
+      g.drawCircle(31,40,10);
+      g.drawString("to exit, move the joystick left",1,55);
+      g.drawRect(43,10,83,30);
+      if(buttons.A.isPressed()){g.fillCircle(90,45,4);}
+      if(buttons.B.isPressed()){g.fillCircle(105,35,4);}
+      if(joystick.button.isPressed()){g.fillCircle(31,40,4);}
+      g.flip();
+      if(joystick.x <= 25){
+        clearInterval(bt);
+        mmc.open("testingMenu");
+      }
+    },20);
+  },
   "< Back" : function(){mmc.open("mainmenu");}
 };
 var gamesListMenu = {
@@ -135,9 +160,11 @@ var settingsMenu = {
   },
   "reconnoct sd card": function(){var sdCard = require('@amperka/card-reader').connect(A10);},
   "Check out the games" : function(){checkGames();},
-  "contrast" : {value : contrastValue,min:10,max:150,step:10,wrap:true,onchange : v => { contrastValue=v; }},
+  "contrast" : {value : settingsValue.contrast, min:10, max:150, step:10, wrap:true, onchange : v => {settingsValue.contrast=v;}},
+  "joystick time update" : {value : settingsValue.joystick_update_time, min:10, max:100, step:5, wrap:true, onchange : v => {settingsValue.joystick_update_time = v;}},
   "Set" : function(){
-    g.setContrast(contrastValue);
+    g.setContrast(settingsValue.contrast);
+    joystick.changeUpdateTime();
   },
   "< Back" : function() {mmc.open("mainmenu");}
 };

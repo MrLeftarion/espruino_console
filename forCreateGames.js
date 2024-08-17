@@ -1,7 +1,7 @@
 function start(){}
 var s = new SPI();
 s.setup({mosi: A7, sck:A5});
-var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A0});
+var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A10});
 g.flip();
 var sdCard = require('@amperka/card-reader').connect(B8);
 
@@ -16,10 +16,8 @@ var joystick = {
   update: function(){
     joystick.xl = joystick.x;
     joystick.yl = joystick.y;
-    joystick.x = Math.round(analogRead(joystick.pinX)*64);
-    joystick.y = Math.round(analogRead(joystick.pinY)*64);
-    g.drawString(joystick.x,20,70);
-    g.flip();
+    joystick.x = Math.round((analogRead(joystick.pinX)*64+joystick.xl)/2);
+    joystick.y = Math.round((analogRead(joystick.pinY)*64+joystick.yl)/2);
   },
   start: function(){
     joystick.pinX.mode('analog');
