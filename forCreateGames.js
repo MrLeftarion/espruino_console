@@ -1,18 +1,32 @@
-function start(){}
+//dump screen
+var btndmp = require('@amperka/button').connect(B3);
+var dmp = setInterval(function(){if(btndmp.isPressed()){g.dump();}},500);
+//
+function start(){}//function for oled
+var settingsValue = {//set before uploading
+  contrast : 150, //from 0 to 150
+  joystick_update_time: 10, //from 10 to 100
+};
+function setSettings(){
+  g.setContrast(settingsValue.contrast);
+  joystick.changeUpdateTime();
+}
 var s = new SPI();
 s.setup({mosi: A7, sck:A5});
 var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A10});
+g.clear();
 g.flip();
 var sdCard = require('@amperka/card-reader').connect(B8);
-
+var sdCard = require('@amperka/card-reader').connect(B8);
 var joystick = {
   pinX: new Pin(A1),
   pinY: new Pin(B0),
-  button: require('@amperka/button').connect(B1),
+  button: require('@amperka/button').connect(B10),
   x: 31,
   y: 31,
   xl: 31,
   yl: 31,
+  updateTime: settingsValue.joystick_update_time,
   update: function(){
     joystick.xl = joystick.x;
     joystick.yl = joystick.y;
@@ -22,7 +36,11 @@ var joystick = {
   start: function(){
     joystick.pinX.mode('analog');
     joystick.pinY.mode('analog');
-    setInterval(function(){joystick.update();},10);
+    joystick.interval = setInterval(function(){joystick.update();},settingsValue.joystick_update_time);
+  },
+  changeUpdateTime: function(){
+    clearInterval(joystick.interval);
+    joystick.interval = setInterval(function(){joystick.update();},settingsValue.joystick_update_time);
   }
 };
 var buttons = {
@@ -30,8 +48,6 @@ var buttons = {
   B: require('@amperka/button').connect(B9),
 };
 joystick.start();
-g.clear();
-var games = [];
 function delay(waitTime){
   waitTime/=1000;
   old_time = getTime();
@@ -51,44 +67,13 @@ var mmc = {//my menu controller - mmc
   open: function(menuName){
       g.clear();
       eval(`m = menu.list(g, ${menuName});`);
-      mmc.nowmenu = menuName;
   },
   addElement: function(menuName,elementName,element){
     eval(`${menuName}.${elementName}=${element}`);
   },
-  nowmenu: "",
   closemenu: function(){m=null;g.clear();},
-  openlastmenu: function(){mmc.open(mmc.nowmenu);},
   extgame: function(){mmc.open("gamesListMenu");},
 };
-var gamesListMenu = {
-  "" : {
-    "title" : "games and programms",
-  },
-  "< Back" : function(){mmc.open("mainmenu");}
-};
-function startGame(path){
-  eval(sdCard.readFile(path));
-}
-function checkGames(){
-  games = sdCard.readDir('games');
-  gamesListMenu = {
-    "" : {
-    "title" : "games and programms",
-    },
-    "< Back" : function(){mmc.open("mainmenu");}
-  };
-  for(i=0;i<games.length;i++){
-    var gamesname = games[i].split(".");
-    mmc.addElement("gamesListMenu",gamesname[0],`function(){startGame("games\\\\${gamesname[0]}.${gamesname[1]}");}`);
-     console.log(i);
-  }
-}
-
-
-//
-
-
 function update(){
   if(joystick.y >= 37 &&  m != null){
     m.move(1);
@@ -100,4 +85,5 @@ function update(){
     m.select();
   }
 }
+setSettings();
 var mainMenuUpdate = setInterval(update,150);
