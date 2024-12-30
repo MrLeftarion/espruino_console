@@ -2,7 +2,7 @@ var dinoGame = {};
 dinoGame.BTNU = buttons.A;
 dinoGame.dinoLeaveGame = {
   "" : {
-    "title" :"you want to leave"
+    "title" :"you want to leave?"
   },
     "Yes":function(){g.clear();mmc.extgame();dinoGame=null;},
     "No":function(){g.clear();dinoGame.gameStart();}

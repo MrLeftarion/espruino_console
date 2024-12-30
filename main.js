@@ -1,6 +1,6 @@
 function start(){}//function for oled
 var settingsValue = {//set before uploading
-  contrast : 0, //from 10 to 150
+  contrast : 150, //from 10 to 150
   joystick_update_time: 10, //from 10 to 100
 };
 function setSettings(){
@@ -10,12 +10,13 @@ function setSettings(){
 var s = new SPI();
 s.setup({mosi: A7, sck:A5});
 var g = require("SSD1306").connectSPI(s, A4 /* DC */, A6 /* RST */, start, { cs : A10});
+
 g.clear();
 g.flip();
 var sdCard = require('@amperka/card-reader').connect(B8);
 var joystick = {
-  pinX: new Pin(A1),
-  pinY: new Pin(B0),
+  pinX: new Pin(B0),
+  pinY: new Pin(B1),
   button: require('@amperka/button').connect(B10),
   x: 31,
   y: 31,
@@ -160,7 +161,7 @@ var settingsMenu = {
   "" : {
     "title" : " Settings "
   },
-  "reconnoct sd card": function(){var sdCard = require('@amperka/card-reader').connect(A10);},
+  "reconnoct sd card": function(){var sdCard = require('@amperka/card-reader').connect(B8);},
   "Check out the games" : function(){checkGames();},
   "contrast" : {value : settingsValue.contrast, min:10, max:150, step:10, wrap:true, onchange : v => {settingsValue.contrast=v;}},
   "joystick time update" : {value : settingsValue.joystick_update_time, min:10, max:100, step:5, wrap:true, onchange : v => {settingsValue.joystick_update_time = v;}},

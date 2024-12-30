@@ -19,8 +19,8 @@ g.flip();
 var sdCard = require('@amperka/card-reader').connect(B8);
 var sdCard = require('@amperka/card-reader').connect(B8);
 var joystick = {
-  pinX: new Pin(A1),
-  pinY: new Pin(B0),
+  pinX: new Pin(B0),
+  pinY: new Pin(B1),
   button: require('@amperka/button').connect(B10),
   x: 31,
   y: 31,
@@ -74,6 +74,9 @@ var mmc = {//my menu controller - mmc
   closemenu: function(){m=null;g.clear();},
   extgame: function(){mmc.open("gamesListMenu");},
 };
+
+//
+
 function update(){
   if(joystick.y >= 37 &&  m != null){
     m.move(1);

@@ -153,7 +153,7 @@ calculator.calcUpdate;
 calculator.anstxt=""
 calculator.LeaveGame = {
   "" : {
-    "title" :"you want to leave"
+    "title" :"you want to leave?"
   },
     "Yes":function(){g.clear();mmc.extgame();calculator=null;},
     "No":function(){g.clear();calculator.startCalc();}
